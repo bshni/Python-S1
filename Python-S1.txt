@@ -1,0 +1,9 @@
+In this lecture we are going to start our journey to learn Python for data analysis. The lecture agenda:
+* VS Code: installation, Python extensions - Jupyter Notebooks, Data Wrangler, workspace configuration, integrated terminal
+* Python virtual environments: creating with venv, activating, installing packages via pip, managing requirements.txt
+* Git fundamentals: internal structure, init, add, commit, and .gitignore
+* Python syntax: indentation rules, case sensitivity, and statement structure
+* Variables and core data types: int, float, str, bool, list, dict, and tuple
+* Conditions – if – else
+* Loops – for & while
+* Functions
