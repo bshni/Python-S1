@@ -1,9 +1,168 @@
-In this lecture we are going to start our journey to learn Python for data analysis. The lecture agenda:
-* VS Code: installation, Python extensions - Jupyter Notebooks, Data Wrangler, workspace configuration, integrated terminal
-* Python virtual environments: creating with venv, activating, installing packages via pip, managing requirements.txt
-* Git fundamentals: internal structure, init, add, commit, and .gitignore
-* Python syntax: indentation rules, case sensitivity, and statement structure
-* Variables and core data types: int, float, str, bool, list, dict, and tuple
-* Conditions – if – else
-* Loops – for & while
-* Functions
+Python for Data Analysis — Session 1
+Lecture Agenda
+============================================================
+
+SECTION 1: Developer Toolkit & Python Foundations
+----------------------------------------------------------
+- VS Code setup: Python extensions, Jupyter Notebooks, Data Wrangler, workspace configuration
+- Python virtual environments: venv, pip, requirements.txt
+- Git fundamentals: init, add, commit, .gitignore
+- Python syntax rules: indentation, case sensitivity, statement structure
+
+SECTION 2: Print Function
+----------------------------------------------------------
+Topics:
+  - Built-in vs third-party vs user-defined functions
+  - print() with single and double quotes
+  - Escape characters: \", \', \\, \n, \t
+  - Triple-quoted strings for multi-line output
+  - Printing variables alongside text
+
+Challenge: Store Receipt Generator
+  - Use print() to produce a formatted store receipt
+  - Practice: string output, variables in print, * repetition operator for dividers
+
+SECTION 3: Variables
+----------------------------------------------------------
+Topics:
+  - Variable as a value container
+  - Naming rules: snake_case, UPPER_SNAKE_CASE for constants
+  - Cannot start with digit; no special characters; no reserved keywords
+  - Case sensitivity: name != Name != NAME
+  - Python reserved keywords (keyword module)
+
+Challenge: Monthly Sales Performance Report
+  - Store sales metrics in correctly named and typed variables
+  - Calculate avg_order_value from variables
+  - Print a formatted report using only variables
+
+SECTION 4: Input Function
+----------------------------------------------------------
+Topics:
+  - input() to collect user input dynamically
+  - input() always returns str — type conversion required for numeric inputs
+
+Combined Challenge: Dataset Profile Reporter
+  - Combines: comments, variables, input(), print()
+  - Collect dataset metadata interactively
+  - Calculate total_cells and missing_pct
+  - Print a formatted dataset profile report
+
+SECTION 5: Python Data Types
+----------------------------------------------------------
+Topics:
+  - Single-value types: int, float, str, bool
+  - Empty type: None
+  - Many-value types: list, set, dict, tuple (overview)
+  - Dynamic type allocation — Python infers type from assigned value
+  - Standalone functions vs class methods (function_name(value) vs value.method_name())
+  - type(), str(), built-in module vs import module
+  - Python standard library modules
+
+Quick Check: 5-Question MCQ
+  - Dynamic allocation, reassignment, choosing correct types, function vs method, type error consequences
+
+Challenge: Customer Record Builder
+  - Create variables of all 5 single-value types
+  - Verify each with type()
+  - Call .upper() method and explain dot notation
+  - Reassign int to str and observe dynamic typing
+
+SECTION 6: String Data Type
+----------------------------------------------------------
+Topics:
+  Group 1 — Type Conversion:    type(), str()
+  Group 2 — Measurement:        len(), .count()
+  Group 3 — Transformation:     .replace(), + (concatenation), f-strings,
+                                  .split(), * (repetition), indexing, slicing
+  Group 4 — Cleaning:           .lstrip(), .rstrip(), .strip(), .lower(), .upper(), .title()
+  Group 5 — Searching:          .startswith(), .endswith(), in operator, .find()
+  Group 6 — Validation:         .isalpha(), .isnumeric()
+
+Challenge: Raw Customer Transaction Cleaner
+  - Clean 5 raw strings each with a different data quality problem
+  - Apply all 6 groups sequentially
+  - Produce a formatted summary report using f-strings
+
+SECTION 7: Numeric Data Types
+----------------------------------------------------------
+Topics:
+  - Numeric types: int, float, complex
+  - Type conversion: int(), float(), str(), complex()
+  - Math operators: +, -, *, /, // (floor division), % (modulo), ** (exponent)
+  - Shortcut operators: +=, -=, *=
+  - Rounding group:
+      abs()          — absolute value (built-in)
+      round(x, n)    — round to n decimals (built-in, banker's rounding)
+      math.floor()   — always round down
+      math.ceil()    — always round up
+      math.trunc()   — remove decimals without rounding
+  - Random module: random.random(), random.randint(a, b)
+  - Validation: .is_integer(), isinstance(value, type)
+
+Challenge: Annual Revenue Analytics Engine
+  - Fix intern's type error, apply Q4 adjustment with +=
+  - Calculate totals, averages, projections using all operators
+  - Apply all 5 rounding functions
+  - Generate dummy QA test data with random module
+  - Validate types with is_integer() and isinstance()
+  - Print full annual report using f-strings
+
+SECTION 8: Python Flow Control — Introduction
+----------------------------------------------------------
+Topics:
+  - Conditional branching: if / elif / else statements
+  - Looping: for loops, while loops
+  - Flow control big picture (diagram)
+
+Resources: Video lectures 11-14 (links provided in notebook)
+
+SECTION 9: Boolean Expressions & Flow Control Operators
+----------------------------------------------------------
+Topics:
+  Boolean Functions:
+    bool()           — convert any value to True/False (falsy: 0, "", None, [])
+    all([...])       — True only if every value is truthy
+    any([...])       — True if at least one value is truthy
+    isinstance()     — check if a value belongs to a specific data type
+    String/number methods returning bool: .startswith(), .endswith(),
+                                           .isnumeric(), .isalpha(), .is_integer()
+
+  Comparison Operators:
+    ==, !=, <, <=, >, >=
+    Chain comparison: 18 <= age <= 30  (Python's BETWEEN)
+    Rules: = is assignment, == is comparison; strings compared alphabetically; case-sensitive
+
+  Logical Operators:
+    and  — both conditions must be True
+    or   — at least one condition must be True
+    not  — flips True/False
+    Execution order: and has higher priority than or
+    Use parentheses to control order when mixing and + or
+
+  Membership Operators:
+    in     — value exists inside a string/list/sequence
+    not in — value does NOT exist
+
+  Identity Operators:
+    is     — same object in memory (not same value)
+    is not — different object in memory
+    Rule: always use is / is not when comparing against None
+
+Study Notes: Full reference summary of all operators with examples and data analysis use cases
+
+Challenge: Transaction Record Validator
+  - Build 8 quality gates for a data ingestion pipeline
+  - Gate 1: Existence Check (bool, is, is not)
+  - Gate 2: Type Validation (isinstance)
+  - Gate 3: Range Validation (comparison + chain comparison)
+  - Gate 4: Category & Domain Validation (in, not in)
+  - Gate 5: Email Structure (bool + in + endswith + and — single expression)
+  - Gate 6: Business Eligibility (or + and + not + parentheses)
+  - Gate 7: Bulk Checks (all, any)
+  - Gate 8: Full validation report using f-strings
+  Bonus: flag_for_review using a single any() expression
+
+============================================================
+End of Session 1 Agenda
+============================================================
