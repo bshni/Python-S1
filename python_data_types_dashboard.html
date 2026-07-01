@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Data Types — Interactive Dashboard</title>
+<style>
+/* ========== Reset & Base ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #0f172a;
+  --bg-panel: #1e293b;
+  --bg-card: #f8fafc;
+  --bg-card-alt: #f1f5f9;
+  --ink: #0f172a;
+  --ink-soft: #475569;
+  --ink-mute: #64748b;
+  --line: #cbd5e1;
+  --accent: #14b8a6;
+  --accent-2: #6366f1;
+  --accent-3: #f59e0b;
+  --accent-4: #ef4444;
+  --accent-5: #ec4899;
+  --code-bg: #0b1220;
+  --code-fg: #e2e8f0;
+  --code-key: #c084fc;
+  --code-str: #86efac;
+  --code-num: #fbbf24;
+  --code-com: #64748b;
+  --code-builtin: #60a5fa;
+  --code-method: #f472b6;
+  --code-op: #94a3b8;
+  --shadow: 0 10px 30px rgba(0,0,0,0.25);
+  --radius: 14px;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg-deep);
+  color: var(--bg-card);
+  line-height: 1.6;
+  font-size: 16px;
+  min-height: 100vh;
+}
+
+/* ========== Header & Nav ========== */
+header.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+.topbar-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-mark {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  display: grid; place-items: center;
+  font-weight: 800;
+  color: white;
+  font-size: 18px;
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.4);
+}
+.brand-text h1 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #f1f5f9;
+}
+.brand-text p {
+  font-size: 12px;
+  color: #94a3b8;
+  letter-spacing: 0.4px;
+}
+nav.main-nav {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+nav.main-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
+}
+nav.main-nav a:hover {
+  background: rgba(20, 184, 166, 0.12);
+  color: #5eead4;
+  border-color: rgba(20, 184, 166, 0.25);
+}
+
+/* ========== Layout ========== */
+main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+section.anchor {
+  scroll-margin-top: 90px;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.section-head h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #f8fafc;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.section-head p {
+  font-size: 15px;
+  color: #94a3b8;
+  max-width: 720px;
+  margin-bottom: 28px;
+}
+
+/* ========== Big Picture Tree ========== */
+.tree-wrap {
+  background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: var(--radius);
+  padding: 40px 28px;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+.tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 760px;
+  position: relative;
+}
+.node {
+  border-radius: 12px;
+  padding: 14px 22px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  user-select: none;
+  border: 2px solid transparent;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+}
+.node:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+}
+.node.root {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: white;
+  font-size: 18px;
+  padding: 18px 32px;
+  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.35);
+}
+.node.pillar {
+  color: white;
+  font-size: 15px;
+  padding: 14px 24px;
+}
+.node.pillar.none { background: linear-gradient(135deg, #64748b, #475569); }
+.node.pillar.single { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.node.pillar.multiple { background: linear-gradient(135deg, #ec4899, #be185d); }
+.node.leaf {
+  background: rgba(30, 41, 59, 0.8);
+  border: 2px solid;
+  color: #e2e8f0;
+  font-size: 13px;
+  padding: 10px 16px;
+  font-weight: 600;
+}
+.node.leaf.none-type { border-color: #64748b; color: #cbd5e1; }
+.node.leaf.int, .node.leaf.float, .node.leaf.complex, .node.leaf.bool { border-color: #f59e0b; color: #fbbf24; }
+.node.leaf.str, .node.leaf.list, .node.leaf.tuple, .node.leaf.set, .node.leaf.dict { border-color: #ec4899; color: #f9a8d4; }
+.node.leaf:hover { background: rgba(51, 65, 85, 1); }
+
+/* Tree connectors */
+.tier {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  position: relative;
+  margin-top: 36px;
+  flex-wrap: nowrap;
+}
+.tier::before {
+  content: "";
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  width: 2px;
+  height: 36px;
+  background: rgba(148, 163, 184, 0.4);
+  transform: translateX(-50%);
+}
+.tier.single-row { gap: 40px; }
+
+.pillar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+.pillar-block::before {
+  content: "";
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  width: 2px;
+  height: 36px;
+  background: rgba(148, 163, 184, 0.4);
+  transform: translateX(-50%);
+}
+
+.leaf-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 28px;
+  position: relative;
+  align-items: center;
+}
+.leaf-group::before {
+  content: "";
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  width: 2px;
+  height: 28px;
+  background: rgba(148, 163, 184, 0.4);
+  transform: translateX(-50%);
+}
+
+.connector-bus {
+  position: absolute;
+  top: -36px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(148, 163, 184, 0.4);
+}
+.pillar-block:first-child .connector-bus,
+.leaf-group-wrapper:first-child .connector-bus { display: none; }
+
+.legend {
+  display: flex;
+  gap: 22px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 12px;
+  color: #94a3b8;
+}
+.legend-item { display: inline-flex; align-items: center; gap: 7px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+/* ========== Functions vs Methods Strip ========== */
+.fvm-strip {
+  margin-top: 48px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.fvm-card {
+  border-radius: 12px;
+  padding: 22px;
+  border: 1px solid var(--line);
+}
+.fvm-card.fn { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border-color: #6ee7b7; }
+.fvm-card.mt { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-color: #93c5fd; }
+.fvm-card h3 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.fvm-card.fn h3 { color: #047857; }
+.fvm-card.mt h3 { color: #1d4ed8; }
+.fvm-card .badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.fvm-card.fn .badge { background: #047857; color: white; }
+.fvm-card.mt .badge { background: #1d4ed8; color: white; }
+.fvm-card p { font-size: 14px; color: var(--ink-soft); margin: 10px 0 12px; }
+.fvm-card .signature {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  display: block;
+  margin-bottom: 8px;
+}
+.fvm-card .signature .k { color: var(--code-key); }
+.fvm-card .signature .b { color: var(--code-builtin); }
+.fvm-card .signature .s { color: var(--code-str); }
+.fvm-card .signature .m { color: var(--code-method); }
+.fvm-card .signature .n { color: var(--code-num); }
+
+@media (max-width: 760px) {
+  .fvm-strip { grid-template-columns: 1fr; }
+}
+
+/* ========== Type Cards ========== */
+.pillar-section {
+  margin-top: 56px;
+}
+.pillar-banner {
+  padding: 22px 28px;
+  border-radius: var(--radius);
+  color: white;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: var(--shadow);
+}
+.pillar-banner.none { background: linear-gradient(120deg, #475569, #334155); }
+.pillar-banner.single { background: linear-gradient(120deg, #f59e0b, #d97706); }
+.pillar-banner.multiple { background: linear-gradient(120deg, #ec4899, #be185d); }
+.pillar-banner .pb-num {
+  font-size: 32px;
+  font-weight: 800;
+  opacity: 0.5;
+  letter-spacing: 1px;
+}
+.pillar-banner h3 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.pillar-banner p { font-size: 13px; opacity: 0.85; }
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 22px;
+}
+.type-card {
+  background: var(--bg-card);
+  color: var(--ink);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border-top: 5px solid var(--accent);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.type-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+}
+.type-card.none { border-top-color: #64748b; }
+.type-card.int { border-top-color: #f59e0b; }
+.type-card.float { border-top-color: #f59e0b; }
+.type-card.complex { border-top-color: #f59e0b; }
+.type-card.bool { border-top-color: #f59e0b; }
+.type-card.str { border-top-color: #ec4899; }
+.type-card.list { border-top-color: #ec4899; }
+.type-card.tuple { border-top-color: #ec4899; }
+.type-card.set { border-top-color: #ec4899; }
+.type-card.dict { border-top-color: #ec4899; }
+
+.card-head {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-card-alt);
+}
+.card-head .type-name {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.card-head .py-name {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.card-head .label {
+  font-size: 13px;
+  color: var(--ink-mute);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.card-head .mut-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.card-head .mut-tag.mut { background: #fee2e2; color: #b91c1c; }
+.card-head .mut-tag.imm { background: #dcfce7; color: #166534; }
+.card-head .core {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-top: 8px;
+  line-height: 1.55;
+}
+.card-head .core strong { color: var(--ink); }
+
+.card-body {
+  padding: 18px 22px;
+  flex: 1;
+}
+.card-body h4 {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 4px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-body h4::before {
+  content: "";
+  width: 4px; height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+.card-body h4:not(:first-child) { margin-top: 18px; }
+
+/* Code blocks */
+pre.code {
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  margin-bottom: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--code-fg);
+}
+pre code { font-family: inherit; background: none; }
+.tok-k { color: var(--code-key); font-weight: 600; }
+.tok-b { color: var(--code-builtin); }
+.tok-s { color: var(--code-str); }
+.tok-n { color: var(--code-num); }
+.tok-c { color: var(--code-com); font-style: italic; }
+.tok-m { color: var(--code-method); }
+.tok-o { color: var(--code-op); }
+.tok-out { color: #94a3b8; font-style: italic; }
+.tok-self { color: var(--code-key); font-style: italic; }
+
+/* Tables */
+table.fn-mt {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  margin-top: 4px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+table.fn-mt thead {
+  background: var(--bg-card-alt);
+}
+table.fn-mt th {
+  text-align: left;
+  padding: 9px 12px;
+  font-size: 11px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+}
+table.fn-mt th.fn-col { background: #ecfdf5; color: #047857; }
+table.fn-mt th.mt-col { background: #eff6ff; color: #1d4ed8; }
+table.fn-mt td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+table.fn-mt tr:last-child td { border-bottom: none; }
+table.fn-mt tr:nth-child(even) td { background: #fafbfc; }
+table.fn-mt td .desc {
+  font-family: -apple-system, sans-serif;
+  color: var(--ink-mute);
+  font-size: 11px;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 30px 20px;
+  color: #64748b;
+  font-size: 13px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  margin-top: 60px;
+}
+footer code {
+  background: rgba(148,163,184,0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "SF Mono", Menlo, monospace;
+  color: #94a3b8;
+}
+
+/* Back to top */
+.totop {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 90;
+  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.5);
+}
+.totop.show { opacity: 1; pointer-events: auto; }
+.totop:hover { background: var(--accent-2); transform: translateY(-2px); }
+
+/* Pillar banner animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+section.anchor { animation: fadeUp 0.6s ease both; }
+
+@media (max-width: 600px) {
+  .topbar-inner { padding: 12px 16px; }
+  nav.main-nav a { padding: 6px 10px; font-size: 12px; }
+  main { padding: 20px 14px 60px; }
+  .section-head h2 { font-size: 24px; }
+  .type-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">Py</div>
+      <div class="brand-text">
+        <h1>Python Data Types</h1>
+        <p>Interactive Educational Dashboard</p>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <a href="#big-picture">Big Picture</a>
+      <a href="#fvm">Functions vs Methods</a>
+      <a href="#none">NoneType</a>
+      <a href="#single">Single Value</a>
+      <a href="#multiple">Multiple Value</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ BIG PICTURE ============ -->
+<section id="big-picture" class="anchor">
+  <div class="section-head">
+    <div class="section-title">Section 1</div>
+    <h2>The Big Picture</h2>
+    <p>Python's data types organise into three architectural pillars. Click any node below to dive into its detailed breakdown.</p>
+  </div>
+
+  <div class="tree-wrap">
+    <div class="tree">
+
+      <!-- Root -->
+      <div class="node root" data-target="#none">Python Data Types</div>
+
+      <!-- Three pillars -->
+      <div class="tier">
+        <div class="pillar-block">
+          <div class="node pillar none" data-target="#none">NoneType</div>
+          <div class="leaf-group">
+            <div class="node leaf none-type" data-target="#none">None</div>
+          </div>
+        </div>
+
+        <div class="pillar-block">
+          <div class="node pillar single" data-target="#single">Single Value Types</div>
+          <div class="leaf-group">
+            <div class="node leaf int" data-target="#int">int</div>
+            <div class="node leaf float" data-target="#float">float</div>
+            <div class="node leaf complex" data-target="#complex">complex</div>
+            <div class="node leaf bool" data-target="#bool">bool</div>
+          </div>
+        </div>
+
+        <div class="pillar-block">
+          <div class="node pillar multiple" data-target="#multiple">Multiple Value Types</div>
+          <div class="leaf-group">
+            <div class="node leaf str" data-target="#str">str</div>
+            <div class="node leaf list" data-target="#list">list</div>
+            <div class="node leaf tuple" data-target="#tuple">tuple</div>
+            <div class="node leaf set" data-target="#set">set</div>
+            <div class="node leaf dict" data-target="#dict">dict</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background:linear-gradient(135deg,#64748b,#475569)"></span>Absence of value</span>
+      <span class="legend-item"><span class="legend-dot" style="background:linear-gradient(135deg,#f59e0b,#d97706)"></span>One scalar value</span>
+      <span class="legend-item"><span class="legend-dot" style="background:linear-gradient(135deg,#ec4899,#be185d)"></span>Collection of values</span>
+    </div>
+  </div>
+
+  <!-- ============ FVM STRIP ============ -->
+  <div class="fvm-strip anchor" id="fvm">
+    <div class="fvm-card fn">
+      <h3>Function <span class="badge">Standalone</span></h3>
+      <p>A standalone block of code, called by name. The data is passed <em>into</em> it as an argument. Functions live in the global/builtin namespace and work on many types.</p>
+      <span class="signature"><span class="b">len</span>(my_list)        <span class="c"># builtin function, data passed in</span>
+<span class="b">sorted</span>(my_list)
+<span class="b">sum</span>([<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>])</span>
+    </div>
+    <div class="fvm-card mt">
+      <h3>Method <span class="badge">Bound to Object</span></h3>
+      <p>A function <em>attached to</em> a specific object/type, called via dot notation. The object itself is the implicit first argument (<code>self</code>) and may mutate the object in place.</p>
+      <span class="signature">my_list.<span class="m">append</span>(<span class="n">42</span>)     <span class="c"># method, object owns the call</span>
+my_str.<span class="m">upper</span>()
+my_dict.<span class="m">keys</span>()</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NoneType PILLAR ============ -->
+<section id="none" class="anchor pillar-section">
+  <div class="pillar-banner none">
+    <div class="pb-num">01</div>
+    <div>
+      <h3>NoneType</h3>
+      <p>The presence of absence — exactly one singleton value: <code style="background:rgba(255,255,255,0.18);padding:1px 6px;border-radius:4px">None</code></p>
+    </div>
+  </div>
+
+  <div class="type-grid">
+
+    <!-- ====== NONE ====== -->
+    <article class="type-card none" id="card-none">
+      <div class="card-head">
+        <div class="type-name">
+          <span class="py-name">None</span>
+          <span class="label">— the singleton null value</span>
+        </div>
+        <span class="mut-tag imm">Immutable · Singleton</span>
+        <p class="core"><strong>Core distinction:</strong> <code>None</code> is the <em>only</em> instance of <code>NoneType</code>. It represents "no value here" — used for missing data, default parameters, and as the implicit return of functions that don't explicitly return. Always compare with <code>is None</code>, never <code>== None</code>.</p>
+      </div>
+      <div class="card-body">
+        <h4>5 Real-World Examples</h4>
+<pre class="code"><code><span class="tok-c"># 1) Sentinel for "no result" from a function</span>
+<span class="tok-k">def</span> <span class="tok-m">find_user</span>(user_id):
+    <span class="tok-k">if</span> user_id <span class="tok-k">not in</span> database:
+        <span class="tok-k">return</span> <span class="tok-k">None</span>
+    <span class="tok-k">return</span> database[user_id]
+
+result = find_user(<span class="tok-n">999</span>)
+<span class="tok-k">if</span> result <span class="tok-k">is</span> <span class="tok-k">None</span>:
+    <span class="tok-b">print</span>(<span class="tok-s">"User not found"</span>)
+<span class="tok-out"># User not found</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 2) Default parameter value (mutable-default avoidance)</span>
+<span class="tok-k">def</span> <span class="tok-m">append_item</span>(item, target=<span class="tok-k">None</span>):
+    <span class="tok-k">if</span> target <span class="tok-k">is</span> <span class="tok-k">None</span>:
+        target = []          <span class="tok-c"># fresh list each call</span>
+    target.append(item)
+    <span class="tok-k">return</span> target
+
+<span class="tok-b">print</span>(append_item(<span class="tok-n">1</span>))   <span class="tok-out"># [1]</span>
+<span class="tok-b">print</span>(append_item(<span class="tok-n">2</span>))   <span class="tok-out"># [2]   -- NOT [1, 2]</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 3) Placeholder while building a structure</span>
+user = {<span class="tok-s">"name"</span>: <span class="tok-s">"Ada"</span>, <span class="tok-s">"email"</span>: <span class="tok-k">None</span>}
+<span class="tok-c"># email collected later in the form flow</span>
+user[<span class="tok-s">"email"</span>] = <span class="tok-s">"ada@example.com"</span>
+<span class="tok-b">print</span>(user)
+<span class="tok-out"># {'name': 'Ada', 'email': 'ada@example.com'}</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 4) Discarding a function's return value explicitly</span>
+<span class="tok-k">def</span> <span class="tok-m">log</span>(msg):
+    <span class="tok-b">print</span>(<span class="tok-s">"[LOG]"</span>, msg)
+    <span class="tok-c"># no return -> implicitly returns None</span>
+
+outcome = log(<span class="tok-s">"booting up"</span>)
+<span class="tok-b">print</span>(outcome <span class="tok-k">is</span> <span class="tok-k">None</span>)
+<span class="tok-out"># True</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 5) Clearing a variable's reference without deleting it</span>
+cache = {<span class="tok-s">"a"</span>: <span class="tok-n">1</span>, <span class="tok-s">"b"</span>: <span class="tok-n">2</span>}
+cache = <span class="tok-k">None</span>          <span class="tok-c"># release reference, allow GC</span>
+<span class="tok-b">print</span>(<span class="tok-b">type</span>(cache))
+<span class="tok-out"># &lt;class 'NoneType'&gt;</span>
+<span class="tok-b">print</span>(<span class="tok-b">bool</span>(cache))
+<span class="tok-out"># False   (None is falsy)</span></code></pre>
+
+        <h4>Functions vs Methods</h4>
+        <table class="fn-mt">
+          <thead>
+            <tr><th class="fn-col">Built-in Functions (accept None)</th><th class="mt-col">NoneType Methods</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>bool(None)</code><span class="desc">→ False (None is falsy)</span></td>
+              <td><em>(none)</em><span class="desc">NoneType intentionally exposes zero methods — it has no behaviour to invoke.</span></td>
+            </tr>
+            <tr>
+              <td><code>type(None)</code><span class="desc">→ &lt;class 'NoneType'&gt;</span></td>
+              <td><em>(none)</em><span class="desc">All interaction happens via operators and built-ins, not methods.</span></td>
+            </tr>
+            <tr>
+              <td><code>id(None)</code><span class="desc">Always returns the same id — singleton</span></td>
+              <td><em>(none)</em></td>
+            </tr>
+            <tr>
+              <td><code>print(None)</code><span class="desc">→ prints "None"</span></td>
+              <td><em>(none)</em></td>
+            </tr>
+            <tr>
+              <td><code>str(None)</code><span class="desc">→ "None" (string form)</span></td>
+              <td><em>(none)</em></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ SINGLE VALUE PILLAR ============ -->
+<section id="single" class="anchor pillar-section">
+  <div class="pillar-banner single">
+    <div class="pb-num">02</div>
+    <div>
+      <h3>Single Value Data Types</h3>
+      <p>Scalars — each object holds exactly one atomic value at a time.</p>
+    </div>
+  </div>
+
+  <div class="type-grid">
+
+    <!-- ====== INT ====== -->
+    <article class="type-card int" id="int">
+      <div class="card-head">
+        <div class="type-name">
+          <span class="py-name">int</span>
+          <span class="label">— arbitrary-precision integer</span>
+        </div>
+        <span class="mut-tag imm">Immutable</span>
+        <p class="core"><strong>Core distinction:</strong> Whole numbers with <em>no size limit</em> (Python 3 auto-promotes beyond 64 bits). Use for counting, indexing, IDs, and exact integer math. No overflow — only your RAM limits you.</p>
+      </div>
+      <div class="card-body">
+        <h4>5 Real-World Examples</h4>
+<pre class="code"><code><span class="tok-c"># 1) Basic arithmetic with operator precedence</span>
+total = <span class="tok-n">7</span> + <span class="tok-n">3</span> * <span class="tok-n">2</span>      <span class="tok-c"># 13, not 20</span>
+remainder = <span class="tok-n">17</span> % <span class="tok-n">5</span>    <span class="tok-c"># 2  (modulo)</span>
+power = <span class="tok-n">2</span> ** <span class="tok-n">10</span>       <span class="tok-c"># 1024</span>
+<span class="tok-b">print</span>(total, remainder, power)
+<span class="tok-out"># 13 2 1024</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 2) Arbitrary precision -- no overflow ever</span>
+big = <span class="tok-n">2</span> ** <span class="tok-n">100</span>
+<span class="tok-b">print</span>(big)
+<span class="tok-out"># 1267650600228229401496703205376</span>
+<span class="tok-b">print</span>(big * big)
+<span class="tok-out"># 1606938044258990275541962092341162602522202993782792835301376</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 3) Parsing strings to int with a base</span>
+decimal = <span class="tok-b">int</span>(<span class="tok-s">"255"</span>)          <span class="tok-c"># 255 (base 10)</span>
+binary  = <span class="tok-b">int</span>(<span class="tok-s">"11111111"</span>, <span class="tok-n">2</span>)  <span class="tok-c"># 255 (base 2)</span>
+hexnum  = <span class="tok-b">int</span>(<span class="tok-s">"ff"</span>, <span class="tok-n">16</span>)        <span class="tok-c"># 255 (base 16)</span>
+<span class="tok-b">print</span>(decimal, binary, hexnum)
+<span class="tok-out"># 255 255 255</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 4) Floor division and divmod for splitting</span>
+cookies = <span class="tok-n">23</span>
+kids = <span class="tok-n">4</span>
+each, leftover = <span class="tok-b">divmod</span>(cookies, kids)
+<span class="tok-b">print</span>(<span class="tok-s">f"Each gets </span>{each}<span class="tok-s">, leftover </span>{leftover}<span class="tok-s">"</span>)
+<span class="tok-out"># Each gets 5, leftover 3</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 5) Bitwise operations on flags</span>
+READ, WRITE, EXEC = <span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">4</span>
+perm = READ | WRITE          <span class="tok-c"># 3</span>
+can_write = <span class="tok-b">bool</span>(perm &amp; WRITE) <span class="tok-c"># True</span>
+<span class="tok-b">print</span>(<span class="tok-b">bin</span>(perm), can_write)
+<span class="tok-out"># 0b11 True</span>
+<span class="tok-b">print</span>((<span class="tok-n">255</span>).bit_count())   <span class="tok-out"># 8 ones in binary</span></code></pre>
+
+        <h4>Functions vs Methods</h4>
+        <table class="fn-mt">
+          <thead>
+            <tr><th class="fn-col">Built-in Functions</th><th class="mt-col">int Methods</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>int("42")</code><span class="desc">constructor / parser</span></td>
+              <td><code>(42).bit_length()</code><span class="desc">bits needed to represent</span></td>
+            </tr>
+            <tr>
+              <td><code>abs(-7)</code><span class="desc">→ 7</span></td>
+              <td><code>(42).bit_count()</code><span class="desc">count of 1-bits (3.10+)</span></td>
+            </tr>
+            <tr>
+              <td><code>pow(2, 10)</code><span class="desc">→ 1024</span></td>
+              <td><code>(255).to_bytes(2, "big")</code><span class="desc">serialise to bytes</span></td>
+            </tr>
+            <tr>
+              <td><code>divmod(23, 4)</code><span class="desc">→ (5, 3)</span></td>
+              <td><code>int.from_bytes(b"\x00\xff", "big")</code><span class="desc">deserialise from bytes</span></td>
+            </tr>
+            <tr>
+              <td><code>bin(10)</code> / <code>hex(255)</code><span class="desc">string representations</span></td>
+              <td><code>(42).conjugate()</code><span class="desc">→ 42 (int is own conjugate)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- ====== FLOAT ====== -->
+    <article class="type-card float" id="float">
+      <div class="card-head">
+        <div class="type-name">
+          <span class="py-name">float</span>
+          <span class="label">— IEEE-754 double precision</span>
+        </div>
+        <span class="mut-tag imm">Immutable</span>
+        <p class="core"><strong>Core distinction:</strong> 64-bit floating point (≈15-17 significant digits). Use for measurements, scientific math, fractions. Carries rounding artefacts — never use <code>==</code> on floats, use <code>math.isclose</code>.</p>
+      </div>
+      <div class="card-body">
+        <h4>5 Real-World Examples</h4>
+<pre class="code"><code><span class="tok-c"># 1) Fractional arithmetic -- note rounding artefacts</span>
+<span class="tok-b">print</span>(<span class="tok-n">0.1</span> + <span class="tok-n">0.2</span>)
+<span class="tok-out"># 0.30000000000000004   (NOT 0.3!)</span>
+<span class="tok-k">import</span> math
+<span class="tok-b">print</span>(math.isclose(<span class="tok-n">0.1</span> + <span class="tok-n">0.2</span>, <span class="tok-n">0.3</span>))
+<span class="tok-out"># True   (correct way to compare floats)</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 2) Scientific notation for huge / tiny numbers</span>
+speed_of_light = <span class="tok-n">2.998e8</span>      <span class="tok-c"># m/s  == 299_800_000.0</span>
+planck = <span class="tok-n">6.626e-34</span>          <span class="tok-c"># J·s  == 0.000...06626</span>
+<span class="tok-b">print</span>(speed_of_light, planck)
+<span class="tok-out"># 299800000.0 6.626e-34</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 3) Special values: infinity and NaN</span>
+inf = <span class="tok-b">float</span>(<span class="tok-s">"inf"</span>)
+nan = <span class="tok-b">float</span>(<span class="tok-s">"nan"</span>)
+<span class="tok-b">print</span>(inf &gt; <span class="tok-n">10</span>**<span class="tok-n">100</span>)       <span class="tok-out"># True</span>
+<span class="tok-b">print</span>(nan == nan)           <span class="tok-out"># False  (NaN is never equal to itself)</span>
+<span class="tok-b">print</span>(math.isnan(nan))       <span class="tok-out"># True</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 4) Rounding for display / currency</span>
+price = <span class="tok-n">19.995</span>
+<span class="tok-b">print</span>(<span class="tok-b">round</span>(price, <span class="tok-n">2</span>))         <span class="tok-out"># 20.0   (banker's rounding)</span>
+<span class="tok-b">print</span>(<span class="tok-b">round</span>(<span class="tok-n">2.5</span>), <span class="tok-b">round</span>(<span class="tok-n">3.5</span>))     <span class="tok-out"># 2 4    (rounds to even)</span>
+<span class="tok-c"># For money, use Decimal, not float:</span>
+<span class="tok-k">from</span> decimal <span class="tok-k">import</span> Decimal
+<span class="tok-b">print</span>(Decimal(<span class="tok-s">"19.995"</span>).quantize(Decimal(<span class="tok-s">"0.01"</span>)))  <span class="tok-out"># 20.00</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 5) Float construction from fraction or string</span>
+<span class="tok-k">from</span> fractions <span class="tok-k">import</span> Fraction
+<span class="tok-b">print</span>(<span class="tok-b">float</span>(Fraction(<span class="tok-n">1</span>, <span class="tok-n">3</span>)))    <span class="tok-out"># 0.3333333333333333</span>
+<span class="tok-b">print</span>(<span class="tok-b">float</span>(<span class="tok-s">"3.14"</span>))           <span class="tok-c"># 3.14</span>
+<span class="tok-b">print</span>((<span class="tok-n">3.14</span>).as_integer_ratio())
+<span class="tok-out"># (7070651414971679, 2251799813685248)</span>
+<span class="tok-b">print</span>((<span class="tok-n">5.0</span>).is_integer())        <span class="tok-out"># True</span></code></pre>
+
+        <h4>Functions vs Methods</h4>
+        <table class="fn-mt">
+          <thead>
+            <tr><th class="fn-col">Built-in Functions</th><th class="mt-col">float Methods</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>float("3.14")</code><span class="desc">constructor / parser</span></td>
+              <td><code>(3.14).is_integer()</code><span class="desc">→ False (5.0 → True)</span></td>
+            </tr>
+            <tr>
+              <td><code>round(3.14159, 2)</code><span class="desc">→ 3.14</span></td>
+              <td><code>(3.14).as_integer_ratio()</code><span class="desc">exact fraction tuple</span></td>
+            </tr>
+            <tr>
+              <td><code>abs(-2.5)</code><span class="desc">→ 2.5</span></td>
+              <td><code>(3.14).hex()</code><span class="desc">hex float repr</span></td>
+            </tr>
+            <tr>
+              <td><code>pow(2.0, 0.5)</code><span class="desc">→ 1.414... (sqrt)</span></td>
+              <td><code>(3.14).conjugate()</code><span class="desc">→ 3.14 (compat with complex)</span></td>
+            </tr>
+            <tr>
+              <td><code>max(1.5, 2.7)</code><span class="desc">→ 2.7</span></td>
+              <td><code>float.fromhex("0x1.8p+1")</code><span class="desc">→ 3.0</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- ====== COMPLEX ====== -->
+    <article class="type-card complex" id="complex">
+      <div class="card-head">
+        <div class="type-name">
+          <span class="py-name">complex</span>
+          <span class="label">— real + imaginary (j)</span>
+        </div>
+        <span class="mut-tag imm">Immutable</span>
+        <p class="core"><strong>Core distinction:</strong> Pairs a real and imaginary float, written <code>a + bj</code>. Use for signal processing, electrical engineering (impedance), quantum mechanics, and 2D rotation. Python uses <code>j</code>, not <code>i</code>.</p>
+      </div>
+      <div class="card-body">
+        <h4>5 Real-World Examples</h4>
+<pre class="code"><code><span class="tok-c"># 1) Creating complex numbers three ways</span>
+z1 = <span class="tok-n">3</span> + <span class="tok-n">4j</span>              <span class="tok-c"># literal</span>
+z2 = <span class="tok-b">complex</span>(<span class="tok-n">3</span>, <span class="tok-n">4</span>)       <span class="tok-c"># constructor</span>
+z3 = <span class="tok-b">complex</span>(<span class="tok-s">"3+4j"</span>)       <span class="tok-c"># from string</span>
+<span class="tok-b">print</span>(z1, z2, z3, z1 == z2 == z3)
+<span class="tok-out"># (3+4j) (3+4j) (3+4j) True</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 2) Accessing real and imaginary parts</span>
+z = <span class="tok-n">5</span> - <span class="tok-n">2j</span>
+<span class="tok-b">print</span>(z.real, <span class="tok-b">type</span>(z.real))    <span class="tok-out"># 5.0 &lt;class 'float'&gt;</span>
+<span class="tok-b">print</span>(z.imag, <span class="tok-b">type</span>(z.imag))    <span class="tok-out"># -2.0 &lt;class 'float'&gt;</span>
+<span class="tok-b">print</span>(<span class="tok-b">abs</span>(z))                 <span class="tok-c"># |z| = sqrt(5^2 + 2^2)</span>
+<span class="tok-out"># 5.385164807134504</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 3) Arithmetic: addition &amp; multiplication behave geometrically</span>
+a = <span class="tok-n">1</span> + <span class="tok-n">1j</span>
+b = <span class="tok-n">1</span> - <span class="tok-n">1j</span>
+<span class="tok-b">print</span>(a + b)               <span class="tok-out"># 2+0j  (vector add)</span>
+<span class="tok-b">print</span>(a * b)               <span class="tok-out"># 2+0j  (|a|*|b| since b = conj(a))</span>
+<span class="tok-b">print</span>(a.conjugate())       <span class="tok-out"># 1-1j  (flips imaginary sign)</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 4) Electrical impedance: Z = R + jX</span>
+resistor = <span class="tok-n">100</span> + <span class="tok-n">0j</span>         <span class="tok-c"># pure resistor</span>
+inductor = <span class="tok-n">0</span> + <span class="tok-n">50j</span>           <span class="tok-c"># X_L = +50 ohm</span>
+capacitor = <span class="tok-n">0</span> - <span class="tok-n">30j</span>          <span class="tok-c"># X_C = -30 ohm</span>
+total_impedance = resistor + inductor + capacitor
+<span class="tok-b">print</span>(total_impedance)
+<span class="tok-out"># (100+20j)</span>
+<span class="tok-b">print</span>(<span class="tok-b">abs</span>(total_impedance))   <span class="tok-out"># ~101.98 ohm</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 5) 2D rotation as complex multiplication</span>
+<span class="tok-k">import</span> math
+point = <span class="tok-n">1</span> + <span class="tok-n">0j</span>                  <span class="tok-c"># point at (1, 0)</span>
+angle = math.radians(<span class="tok-n">90</span>)        <span class="tok-c"># rotate 90°</span>
+rotator = <span class="tok-b">complex</span>(math.cos(angle), math.sin(angle))
+rotated = point * rotator
+<span class="tok-b">print</span>(rotated)
+<span class="tok-out"># (6.12e-17+1j)  ≈ 0+1j  → point moved to (0, 1)</span></code></pre>
+
+        <h4>Functions vs Methods</h4>
+        <table class="fn-mt">
+          <thead>
+            <tr><th class="fn-col">Built-in Functions</th><th class="mt-col">complex Methods</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>complex(3, 4)</code><span class="desc">constructor</span></td>
+              <td><code>z.conjugate()</code><span class="desc">→ mirror across real axis</span></td>
+            </tr>
+            <tr>
+              <td><code>abs(3+4j)</code><span class="desc">→ 5.0 (magnitude)</span></td>
+              <td><code>z.real</code><span class="desc">attribute, not method</span></td>
+            </tr>
+            <tr>
+              <td><code>pow(z, 2)</code><span class="desc">→ square</span></td>
+              <td><code>z.imag</code><span class="desc">attribute, not method</span></td>
+            </tr>
+            <tr>
+              <td><code>divmod(z, w)</code><span class="desc">→ TypeError (no floor div)</span></td>
+              <td><em>(essentially one method)</em><span class="desc">complex is a minimal type by design</span></td>
+            </tr>
+            <tr>
+              <td><code>cmath.sqrt(-1)</code><span class="desc">→ 1j (via cmath module)</span></td>
+              <td><em>(none)</em><span class="desc">math functions live in <code>cmath</code>, not on the object</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- ====== BOOL ====== -->
+    <article class="type-card bool" id="bool">
+      <div class="card-head">
+        <div class="type-name">
+          <span class="py-name">bool</span>
+          <span class="label">— True / False (subclass of int)</span>
+        </div>
+        <span class="mut-tag imm">Immutable</span>
+        <p class="core"><strong>Core distinction:</strong> A <em>subclass of int</em> — <code>True == 1</code> and <code>False == 0</code> both hold. Use for flags, conditions, and any "yes/no" state. Every value in Python is truthy or falsy via <code>bool()</code>.</p>
+      </div>
+      <div class="card-body">
+        <h4>5 Real-World Examples</h4>
+<pre class="code"><code><span class="tok-c"># 1) Comparisons return bool objects</span>
+<span class="tok-b">print</span>(<span class="tok-n">5</span> &gt; <span class="tok-n">3</span>, <span class="tok-n">5</span> == <span class="tok-n">5</span>, <span class="tok-n">5</span> != <span class="tok-n">5</span>)
+<span class="tok-out"># True True False</span>
+<span class="tok-b">print</span>(<span class="tok-b">type</span>(<span class="tok-n">5</span> &gt; <span class="tok-n">3</span>))
+<span class="tok-out"># &lt;class 'bool'&gt;</span>
+<span class="tok-b">print</span>(<span class="tok-b">issubclass</span>(<span class="tok-b">bool</span>, <span class="tok-b">int</span>))
+<span class="tok-out"># True   -- bool IS an int</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 2) Logical operators: and, or, not</span>
+is_admin = <span class="tok-k">True</span>
+is_active = <span class="tok-k">False</span>
+can_login = is_active <span class="tok-k">and</span> is_admin     <span class="tok-out"># False</span>
+can_reset = is_admin <span class="tok-k">or</span> is_active       <span class="tok-out"># True</span>
+blocked = <span class="tok-k">not</span> is_active                 <span class="tok-out"># True</span>
+<span class="tok-b">print</span>(can_login, can_reset, blocked)
+<span class="tok-out"># False True True</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 3) bool() of any value -- the truthiness rule</span>
+<span class="tok-b">print</span>(<span class="tok-b">bool</span>(<span class="tok-n">0</span>), <span class="tok-b">bool</span>(<span class="tok-n">0.0</span>), <span class="tok-b">bool</span>(<span class="tok-s">""</span>), <span class="tok-b">bool</span>([]), <span class="tok-b">bool</span>({}), <span class="tok-b">bool</span>(<span class="tok-k">None</span>))
+<span class="tok-out"># False False False False False False   (all "empty" → False)</span>
+<span class="tok-b">print</span>(<span class="tok-b">bool</span>(<span class="tok-n">1</span>), <span class="tok-b">bool</span>(<span class="tok-s">"hi"</span>), <span class="tok-b">bool</span>([<span class="tok-n">0</span>]), <span class="tok-b">bool</span>(<span class="tok-s">"False"</span>))
+<span class="tok-out"># True True True True  (non-empty → True, even "False" the string!)</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 4) True/False as integers in arithmetic (footgun!)</span>
+sales = [<span class="tok-n">100</span>, <span class="tok-n">0</span>, <span class="tok-n">250</span>, <span class="tok-n">0</span>, <span class="tok-n">80</span]]
+<span class="tok-c"># Count non-zero sales using bool sum trick:</span>
+non_zero_count = <span class="tok-b">sum</span>(<span class="tok-b">bool</span>(s) <span class="tok-k">for</span> s <span class="tok-k">in</span> sales)
+<span class="tok-b">print</span>(non_zero_count)
+<span class="tok-out"># 3   (True = 1 added three times)</span>
+<span class="tok-b">print</span>(<span class="tok-k">True</span> + <span class="tok-k">True</span> + <span class="tok-k">True</span>)
+<span class="tok-out"># 3</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 5) Feature flags &amp; conditional dispatch</span>
+feature_flags = {
+    <span class="tok-s">"dark_mode"</span>: <span class="tok-k">True</span>,
+    <span class="tok-s">"beta_ui"</span>:   <span class="tok-k">False</span>,
+    <span class="tok-s">"analytics"</span>: <span class="tok-k">True</span>,
+}
+<span class="tok-k">if</span> feature_flags[<span class="tok-s">"dark_mode"</span>]:
+    theme = <span class="tok-s">"dark"</span>
+<span class="tok-k">else</span>:
+    theme = <span class="tok-s">"light"</span>
+<span class="tok-b">print</span>(theme)
+<span class="tok-out"># dark</span></code></pre>
+
+        <h4>Functions vs Methods</h4>
+        <table class="fn-mt">
+          <thead>
+            <tr><th class="fn-col">Built-in Functions</th><th class="mt-col">bool Methods</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>bool(0)</code><span class="desc">→ False (the constructor / truthifier)</span></td>
+              <td><em>(inherits all int methods)</em><span class="desc">bool defines none of its own</span></td>
+            </tr>
+            <tr>
+              <td><code>bool([])</code><span class="desc">→ False (empty container is falsy)</span></td>
+              <td><code>True.bit_count()</code><span class="desc">→ 1 (inherited from int)</span></td>
+            </tr>
+            <tr>
+              <td><code>any([False, True])</code><span class="desc">→ True (OR over iterable)</span></td>
+              <td><code>True.bit_length()</code><span class="desc">→ 1 (inherited from int)</span></td>
+            </tr>
+            <tr>
+              <td><code>all([True, True])</code><span class="desc">→ True (AND over iterable)</span></td>
+              <td><em>(none)</em><span class="desc">logical ops are operators, not methods</span></td>
+            </tr>
+            <tr>
+              <td><code>issubclass(bool, int)</code><span class="desc">→ True (family check)</span></td>
+              <td><em>(none)</em><span class="desc">boolean algebra is done with <code>and</code>/<code>or</code>/<code>not</code></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ MULTIPLE VALUE PILLAR ============ -->
+<section id="multiple" class="anchor pillar-section">
+  <div class="pillar-banner multiple">
+    <div class="pb-num">03</div>
+    <div>
+      <h3>Multiple Value Data Types</h3>
+      <p>Collections — one object holding many values, in various shapes (ordered / unordered, mutable / immutable).</p>
+    </div>
+  </div>
+
+  <div class="type-grid">
+
+    <!-- ====== STR ====== -->
+    <article class="type-card str" id="str">
+      <div class="card-head">
+        <div class="type-name">
+          <span class="py-name">str</span>
+          <span class="label">— immutable Unicode text</span>
+        </div>
+        <span class="mut-tag imm">Immutable · Ordered · Iterable</span>
+        <p class="core"><strong>Core distinction:</strong> An immutable sequence of Unicode code points. Every "edit" produces a <em>new</em> string. Use for any text — names, logs, JSON, regex. Python 3 strings are fully Unicode by default.</p>
+      </div>
+      <div class="card-body">
+        <h4>5 Real-World Examples</h4>
+<pre class="code"><code><span class="tok-c"># 1) Creation: single, double, triple-quoted strings</span>
+name = <span class="tok-s">'Ada Lovelace'</span>
+greeting = <span class="tok-s">"It's alive!"</span>          <span class="tok-c"># double to embed apostrophe</span>
+poem = <span class="tok-s">"""Roses are red,
+Violets are blue,
+Python is awesome,
+And so are you."""</span>
+<span class="tok-b">print</span>(poem.count(<span class="tok-s">"\n"</span>))
+<span class="tok-out"># 3</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 2) Slicing &amp; indexing (str IS a sequence)</span>
+url = <span class="tok-s">"https://example.com"</span>
+<span class="tok-b">print</span>(url[<span class="tok-n">0</span>:<span class="tok-n">5</span>])        <span class="tok-out"># 'https'</span>
+<span class="tok-b">print</span>(url[-<span class="tok-n">4</span>:])        <span class="tok-out"># '.com'</span>
+<span class="tok-b">print</span>(url[::-<span class="tok-n">1</span>])       <span class="tok-out"># 'moc.elpmaxe//:sptth' (reversed)</span>
+<span class="tok-b">print</span>(<span class="tok-b">len</span>(url))         <span class="tok-out"># 19</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 3) f-string formatting (Python 3.6+)</span>
+user = <span class="tok-s">"Marie"</span>
+score = <span class="tok-n">98.6</span>
+msg = <span class="tok-s">f"User {user!r} scored {score:.1f} points"</span>
+<span class="tok-b">print</span>(msg)
+<span class="tok-out"># User 'Marie' scored 98.6 points</span>
+<span class="tok-c"># !r forces repr, :.1f formats float</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 4) Common text transformations</span>
+raw = <span class="tok-s">"  Hello, World!  "</span>
+clean = raw.strip()                 <span class="tok-c"># 'Hello, World!'</span>
+upper = clean.upper()               <span class="tok-c"># 'HELLO, WORLD!'</span>
+words = clean.split(<span class="tok-s">", "</span>)           <span class="tok-c"># ['Hello', 'World!']</span>
+joined = <span class="tok-s">"-"</span>.join(words)            <span class="tok-c"># 'Hello-World!'</span>
+replaced = clean.replace(<span class="tok-s">"World"</span>, <span class="tok-s">"Python"</span>)
+<span class="tok-b">print</span>(replaced)
+<span class="tok-out"># Hello, Python!</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 5) Unicode handling -- emojis &amp; non-ASCII</span>
+emoji = <span class="tok-s">"Python 🐍"</span>
+<span class="tok-b">print</span>(<span class="tok-b">len</span>(emoji))            <span class="tok-out"># 8  (7 ASCII chars + 1 emoji code point)</span>
+<span class="tok-b">print</span>(emoji[-<span class="tok-n">1</span>>])              <span class="tok-out"># 🐍</span>
+<span class="tok-b">print</span>(<span class="tok-b">ord</span>(<span class="tok-s">"A"</span>), <span class="tok-b">ord</span>(<span class="tok-s">"🐍"</span>))       <span class="tok-out"># 65 128013</span>
+<span class="tok-b">print</span>(<span class="tok-b">chr</span>(<span class="tok-n">128013</span>))            <span class="tok-out"># 🐍</span></code></pre>
+
+        <h4>Functions vs Methods</h4>
+        <table class="fn-mt">
+          <thead>
+            <tr><th class="fn-col">Built-in Functions</th><th class="mt-col">str Methods (selected)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>len("hello")</code><span class="desc">→ 5</span></td>
+              <td><code>s.upper()</code> / <code>s.lower()</code><span class="desc">case conversion</span></td>
+            </tr>
+            <tr>
+              <td><code>str(42)</code><span class="desc">→ "42" (constructor)</span></td>
+              <td><code>s.split(sep)</code> / <code>sep.join(list)</code><span class="desc">split / rejoin</span></td>
+            </tr>
+            <tr>
+              <td><code>ord("A")</code> / <code>chr(65)</code><span class="desc">char ↔ code point</span></td>
+              <td><code>s.replace(old, new)</code><span class="desc">substitute</span></td>
+            </tr>
+            <tr>
+              <td><code>repr(s)</code><span class="desc">developer representation</span></td>
+              <td><code>s.strip()</code> / <code>s.lstrip()</code> / <code>s.rstrip()</code><span class="desc">trim whitespace</span></td>
+            </tr>
+            <tr>
+              <td><code>"abc" in s</code><span class="desc">membership (operator)</span></td>
+              <td><code>s.find(sub)</code> / <code>s.startswith(p)</code><span class="desc">location / prefix</span></td>
+            </tr>
+            <tr>
+              <td><code>sorted("bca")</code><span class="desc">→ ['a','b','c']</span></td>
+              <td><code>s.format(**kw)</code> / f-strings<span class="desc">templating</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- ====== LIST ====== -->
+    <article class="type-card list" id="list">
+      <div class="card-head">
+        <div class="type-name">
+          <span class="py-name">list</span>
+          <span class="label">— mutable ordered sequence</span>
+        </div>
+        <span class="mut-tag mut">Mutable · Ordered · Iterable</span>
+        <p class="core"><strong>Core distinction:</strong> The workhorse ordered collection — append, insert, remove, sort in place. Use for stacks, queues, accumulators, anything that grows/shrinks. O(1) append/pop from the end.</p>
+      </div>
+      <div class="card-body">
+        <h4>5 Real-World Examples</h4>
+<pre class="code"><code><span class="tok-c"># 1) Creation: literals, constructors, comprehensions</span>
+nums = [<span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>]
+from_range = <span class="tok-b">list</span>(<span class="tok-b">range</span>(<span class="tok-n">5</span>))          <span class="tok-out"># [0, 1, 2, 3, 4]</span>
+mixed = [<span class="tok-n">1</span>, <span class="tok-s">"two"</span>, <span class="tok-n">3.0</span>, [<span class="tok-n">4</span>]]     <span class="tok-c"># heterogeneous OK</span>
+squares = [x*x <span class="tok-k">for</span> x <span class="tok-k">in</span> <span class="tok-b">range</span>(<span class="tok-n">5</span>)]    <span class="tok-out"># [0, 1, 4, 9, 16]</span>
+<span class="tok-b">print</span>(nums, from_range, mixed, squares)</code></pre>
+
+<pre class="code"><code><span class="tok-c"># 2) Mutation: append, insert, extend, pop, remove</span>
+todo = [<span class="tok-s">"buy milk"</span>, <span class="tok-s">"walk dog"</span>]
+todo.append(<span class="tok-s">"pay bills"</span>)           <span class="tok-c"># end</span>
+todo.insert(<span class="tok-n">0</span>, <span class="tok-s">"wake up"</span>)           <span class="tok-c"># at index 0</span>
+todo.extend([<span class="tok-s">"code"</span>, <span class="tok-s">"sleep"</span>])        <span class="tok-c"># merge</span>
+last = todo.pop()                   <span class="tok-out"># 'sleep'</span>
+todo.remove(<span class="tok-s">"walk dog"</span>)             <span class="tok-c"># by value</span>
+<span class="tok-b">print</span>(todo)
+<span class="tok-out"># ['wake up', 'buy milk', 'pay bills', 'code']</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 3) Slicing returns a NEW list (copy)</span>
+orig = [<span class="tok-n">10</span>, <span class="tok-n">20</span>, <span class="tok-n">30</span>, <span class="tok-n">40</span>, <span class="tok-n">50</span>
+copy = orig[:]                     <span class="tok-c"># shallow copy</span>
+middle = orig[<span class="tok-n">1</span>:<span class="tok-n">4</span>]                 <span class="tok-out"># [20, 30, 40]</span>
+every_other = orig[::<span class="tok-n">2</span>]            <span class="tok-out"># [10, 30, 50]</span>
+rev = orig[::-<span class="tok-n">1</span>]                  <span class="tok-out"># [50, 40, 30, 20, 10]</span>
+orig[<span class="tok-n">0</span>:<span class="tok-n">2</span>] = [<span class="tok-n">99</span>, <span class="tok-n">98</span>]               <span class="tok-c"># slice assignment</span>
+<span class="tok-b">print</span>(orig)
+<span class="tok-out"># [99, 98, 30, 40, 50]</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 4) Sorting &amp; reversing -- in place vs new</span>
+nums = [<span class="tok-n">3</span>, <span class="tok-n">1</span>, <span class="tok-n">4</span>, <span class="tok-n">1</span>, <span class="tok-n">5</span>, <span class="tok-n">9</span>, <span class="tok-n">2</span>, <span class="tok-n">6</span>]
+nums.sort()                        <span class="tok-c"># in place, returns None</span>
+<span class="tok-b">print</span>(nums)
+<span class="tok-out"># [1, 1, 2, 3, 4, 5, 6, 9]</span>
+nums.sort(reverse=<span class="tok-k">True</span>)
+<span class="tok-b">print</span>(nums)
+<span class="tok-out"># [9, 6, 5, 4, 3, 2, 1, 1]</span>
+<span class="tok-c"># sorted() is the FUNCTION version -- returns new list:</span>
+words = [<span class="tok-s">"banana"</span>, <span class="tok-s">"apple"</span>, <span class="tok-s">"cherry"</span>]
+<span class="tok-b">print</span>(<span class="tok-b">sorted</span>(words, key=<span class="tok-b">len</span>))
+<span class="tok-out"># ['apple', 'banana', 'cherry']</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 5) Stacking &amp; queueing patterns</span>
+stack = []
+stack.append(<span class="tok-s">"page1"</span>)
+stack.append(<span class="tok-s">"page2"</span>)
+<span class="tok-b">print</span>(stack.pop())              <span class="tok-out"># 'page2'  (LIFO)</span>
+<span class="tok-c"># For queues, use collections.deque (O(1) popleft):</span>
+<span class="tok-k">from</span> collections <span class="tok-k">import</span> deque
+queue = deque([<span class="tok-s">"a"</span>, <span class="tok-s">"b"</span>])
+queue.append(<span class="tok-s">"c"</span>)
+<span class="tok-b">print</span>(queue.popleft())         <span class="tok-out"># 'a'  (FIFO)</span>
+<span class="tok-b">print</span>(<span class="tok-b">list</span>(queue))            <span class="tok-out"># ['b', 'c']</span></code></pre>
+
+        <h4>Functions vs Methods</h4>
+        <table class="fn-mt">
+          <thead>
+            <tr><th class="fn-col">Built-in Functions</th><th class="mt-col">list Methods</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>len(lst)</code><span class="desc">→ size</span></td>
+              <td><code>lst.append(x)</code><span class="desc">add to end (O(1))</span></td>
+            </tr>
+            <tr>
+              <td><code>sorted(lst)</code><span class="desc">→ new sorted list</span></td>
+              <td><code>lst.sort()</code><span class="desc">sort in place (returns None)</span></td>
+            </tr>
+            <tr>
+              <td><code>reversed(lst)</code><span class="desc">→ iterator</span></td>
+              <td><code>lst.reverse()</code><span class="desc">reverse in place</span></td>
+            </tr>
+            <tr>
+              <td><code>sum(lst)</code> / <code>max(lst)</code> / <code>min(lst)</code><span class="desc">aggregates</span></td>
+              <td><code>lst.extend(iter)</code> / <code>lst.insert(i, x)</code><span class="desc">bulk add / positional add</span></td>
+            </tr>
+            <tr>
+              <td><code>enumerate(lst)</code> / <code>zip(a, b)</code><span class="desc">iteration helpers</span></td>
+              <td><code>lst.pop(i)</code> / <code>lst.remove(x)</code> / <code>lst.clear()</code><span class="desc">removal</span></td>
+            </tr>
+            <tr>
+              <td><code>list(range(5))</code><span class="desc">constructor</span></td>
+              <td><code>lst.index(x)</code> / <code>lst.count(x)</code><span class="desc">lookup</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- ====== TUPLE ====== -->
+    <article class="type-card tuple" id="tuple">
+      <div class="card-head">
+        <div class="type-name">
+          <span class="py-name">tuple</span>
+          <span class="label">— immutable ordered sequence</span>
+        </div>
+        <span class="mut-tag imm">Immutable · Ordered · Hashable</span>
+        <p class="core"><strong>Core distinction:</strong> Like a list, but you cannot change it after creation. Use for fixed records, multi-return, dict keys, and protecting data from accidental mutation. Slightly faster and lighter than list.</p>
+      </div>
+      <div class="card-body">
+        <h4>5 Real-World Examples</h4>
+<pre class="code"><code><span class="tok-c"># 1) Creation -- note the trailing comma for singletons</span>
+empty = ()
+single = (<span class="tok-n">42</span>,)            <span class="tok-c"># COMMA is required! (42) is just an int</span>
+multi = (<span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>)
+no_parens = <span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>      <span class="tok-c"># parens optional</span>
+from_list = <span class="tok-b">tuple</span>([<span class="tok-n">4</span>, <span class="tok-n">5</span>, <span class="tok-n">6</span>])
+<span class="tok-b">print</span>(single, multi, no_parens, from_list)
+<span class="tok-out"># (42,) (1, 2, 3) (1, 2, 3) (4, 5, 6)</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 2) Packing &amp; unpacking (the canonical use case)</span>
+point = (<span class="tok-n">3</span>, <span class="tok-n">4</span>)             <span class="tok-c"># packing</span>
+x, y = point                 <span class="tok-c"># unpacking</span>
+<span class="tok-b">print</span>(x, y)                 <span class="tok-out"># 3 4</span>
+<span class="tok-c"># Swap two values without a temp variable:</span>
+a, b = <span class="tok-n">10</span>, <span class="tok-n">20</span>
+a, b = b, a
+<span class="tok-b">print</span>(a, b)                 <span class="tok-out"># 20 10</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 3) Returning multiple values from a function</span>
+<span class="tok-k">def</span> <span class="tok-m">min_max</span>(numbers):
+    <span class="tok-k">return</span> <span class="tok-b">min</span>(numbers), <span class="tok-b">max</span>(numbers)   <span class="tok-c"># implicit tuple</span>
+lo, hi = min_max([<span class="tok-n">3</span>, <span class="tok-n">7</span>, <span class="tok-n">1</span>, <span class="tok-n">9</span>, <span class="tok-n">2</span>])
+<span class="tok-b">print</span>(<span class="tok-s">f"min={lo}, max={hi}"</span>)
+<span class="tok-out"># min=1, max=9</span>
+<span class="tok-c"># Catch-all unpacking with *:</span>
+first, *rest = (<span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>, <span class="tok-n">4</span>, <span class="tok-n">5</span>)
+<span class="tok-b">print</span>(first, rest)         <span class="tok-out"># 1 [2, 3, 4, 5]</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 4) Used as dict keys (lists CANNOT do this!)</span>
+locations = {
+    (<span class="tok-n">40.7128</span>, -<span class="tok-n">74.0060</span>): <span class="tok-s">"New York"</span>,
+    (<span class="tok-n">34.0522</span>, -<span class="tok-n">118.2437</span>): <span class="tok-s">"Los Angeles"</span>,
+    (<span class="tok-n">51.5074</span>, -<span class="tok-n">0.1278</span>): <span class="tok-s">"London"</span>,
+}
+<span class="tok-b">print</span>(locations[(<span class="tok-n">40.7128</span>, -<span class="tok-n">74.0060</span>)])
+<span class="tok-out"># New York</span>
+<span class="tok-c"># Why? Tuples are hashable; lists are not (mutable).</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 5) Named tuples for self-documenting records</span>
+<span class="tok-k">from</span> collections <span class="tok-k">import</span> namedtuple
+Point = namedtuple(<span class="tok-s">"Point"</span>, [<span class="tok-s">"x"</span>, <span class="tok-s">"y"</span>])
+p = Point(<span class="tok-n">3</span>, <span class="tok-n">4</span>)
+<span class="tok-b">print</span>(p.x, p.y)             <span class="tok-out"># 3 4  (access by name!)</span>
+<span class="tok-b">print</span>(p[<span class="tok-n">0</span>], p[<span class="tok-n">1</span>])            <span class="tok-out"># 3 4  (still indexable)</span>
+<span class="tok-b">print</span>(p._asdict())          <span class="tok-out"># {'x': 3, 'y': 4}</span>
+<span class="tok-c"># Immutability means no p.x = 5 --&gt; AttributeError</span></code></pre>
+
+        <h4>Functions vs Methods</h4>
+        <table class="fn-mt">
+          <thead>
+            <tr><th class="fn-col">Built-in Functions</th><th class="mt-col">tuple Methods (only 2!)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>len(t)</code><span class="desc">→ size</span></td>
+              <td><code>t.count(x)</code><span class="desc">occurrences of x</span></td>
+            </tr>
+            <tr>
+              <td><code>tuple([1,2])</code><span class="desc">constructor</span></td>
+              <td><code>t.index(x)</code><span class="desc">first index of x</span></td>
+            </tr>
+            <tr>
+              <td><code>sorted(t)</code><span class="desc">→ new sorted <em>list</em> (not tuple)</span></td>
+              <td><em>(nothing else)</em><span class="desc">immutability → no add/remove/sort</span></td>
+            </tr>
+            <tr>
+              <td><code>min(t)</code> / <code>max(t)</code> / <code>sum(t)</code><span class="desc">aggregates</span></td>
+              <td><em>(none)</em><span class="desc">two methods total — by design</span></td>
+            </tr>
+            <tr>
+              <td><code>hash(t)</code><span class="desc">→ int (only if all elements are hashable)</span></td>
+              <td><em>(none)</em><span class="desc">use slicing and concatenation to "modify"</span></td>
+            </tr>
+            <tr>
+              <td><code>zip(a, b)</code><span class="desc">→ iterator of tuples</span></td>
+              <td><em>(none)</em></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- ====== SET ====== -->
+    <article class="type-card set" id="set">
+      <div class="card-head">
+        <div class="type-name">
+          <span class="py-name">set</span>
+          <span class="label">— mutable unordered unique collection</span>
+        </div>
+        <span class="mut-tag mut">Mutable · Unordered · Unique</span>
+        <p class="core"><strong>Core distinction:</strong> Holds only <em>unique, hashable</em> elements with no defined order. O(1) membership tests. Use for deduplication and set-theory math (union, intersection, difference).</p>
+      </div>
+      <div class="card-body">
+        <h4>5 Real-World Examples</h4>
+<pre class="code"><code><span class="tok-c"># 1) Deduplication -- the killer use case</span>
+visitors = [<span class="tok-s">"alice"</span>, <span class="tok-s">"bob"</span>, <span class="tok-s">"alice"</span>, <span class="tok-s">"carol"</span>, <span class="tok-s">"bob"</span>]
+unique_visitors = <span class="tok-b">set</span>(visitors)
+<span class="tok-b">print</span>(unique_visitors)
+<span class="tok-out"># {'alice', 'bob', 'carol'}   (order not guaranteed)</span>
+<span class="tok-b">print</span>(<span class="tok-b">len</span>(unique_visitors))
+<span class="tok-out"># 3</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 2) O(1) membership testing vs O(n) for lists</span>
+valid_codes = {<span class="tok-s">"X-100"</span>, <span class="tok-s">"X-200"</span>, <span class="tok-s">"X-300"</span>}
+user_input = <span class="tok-s">"X-200"</span>
+<span class="tok-k">if</span> user_input <span class="tok-k">in</span> valid_codes:        <span class="tok-c"># fast even for millions of codes</span>
+    <span class="tok-b">print</span>(<span class="tok-s">"Valid!"</span>)
+<span class="tok-out"># Valid!</span>
+<span class="tok-c"># Empty set MUST use set() -- {} is a dict!</span>
+empty = <span class="tok-b">set</span>()
+<span class="tok-b">print</span>(<span class="tok-b">type</span>(empty))             <span class="tok-out"># &lt;class 'set'&gt;</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 3) Set operations: union, intersection, difference</span>
+frontend = {<span class="tok-s">"Alice"</span>, <span class="tok-s">"Bob"</span>, <span class="tok-s">"Carol"</span>}
+backend  = {<span class="tok-s">"Bob"</span>, <span class="tok-s">"Dave"</span>, <span class="tok-s">"Eve"</span>}
+<span class="tok-b">print</span>(frontend | backend)    <span class="tok-out"># union: {'Alice','Bob','Carol','Dave','Eve'}</span>
+<span class="tok-b">print</span>(frontend &amp; backend)     <span class="tok-out"># intersection: {'Bob'}</span>
+<span class="tok-b">print</span>(frontend - backend)    <span class="tok-out"># difference: {'Alice', 'Carol'}</span>
+<span class="tok-b">print</span>(frontend ^ backend)    <span class="tok-out"># symmetric diff: {'Alice','Carol','Dave','Eve'}</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 4) Mutation: add, remove, discard, update</span>
+tags = {<span class="tok-s">"python"</span>, <span class="tok-s">"web"</span>}
+tags.add(<span class="tok-s">"backend"</span>)             <span class="tok-c"># add single</span>
+tags.update([<span class="tok-s">"api"</span>, <span class="tok-s">"docker"</span>])     <span class="tok-c"># add many</span>
+tags.discard(<span class="tok-s">"web"</span>)              <span class="tok-c"># remove, no error if missing</span>
+<span class="tok-c"># tags.remove("not_there")  # WOULD raise KeyError</span>
+popped = tags.pop()                <span class="tok-c"># arbitrary element removed</span>
+<span class="tok-b">print</span>(tags, <span class="tok-s">"popped:"</span>, popped)</code></pre>
+
+<pre class="code"><code><span class="tok-c"># 5) frozenset -- the immutable cousin (hashable!)</span>
+fs = <span class="tok-b">frozenset</span>([<span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>])
+<span class="tok-c"># fs.add(4)  --&gt; AttributeError (immutable)</span>
+<span class="tok-c"># Can be used as dict key or set element:</span>
+graph = {
+    <span class="tok-b">frozenset</span>({<span class="tok-s">"a"</span>, <span class="tok-s">"b"</span>}): <span class="tok-s">"edge1"</span>,
+    <span class="tok-b">frozenset</span>({<span class="tok-s">"b"</span>, <span class="tok-s">"c"</span>}): <span class="tok-s">"edge2"</span>,
+}
+<span class="tok-b">print</span>(graph[<span class="tok-b">frozenset</span>({<span class="tok-s">"b"</span>, <span class="tok-s">"a"</span>})])   <span class="tok-out"># 'edge1' (order-insensitive!)</span>
+<span class="tok-b">print</span>({<span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>} &gt;= {<span class="tok-n">1</span>, <span class="tok-n">2</span>})               <span class="tok-out"># True  (superset check)</span></code></pre>
+
+        <h4>Functions vs Methods</h4>
+        <table class="fn-mt">
+          <thead>
+            <tr><th class="fn-col">Built-in Functions</th><th class="mt-col">set Methods</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>len(s)</code><span class="desc">→ cardinality</span></td>
+              <td><code>s.add(x)</code> / <code>s.remove(x)</code> / <code>s.discard(x)</code><span class="desc">insert / delete</span></td>
+            </tr>
+            <tr>
+              <td><code>set(iter)</code><span class="desc">constructor / deduper</span></td>
+              <td><code>s.union(t)</code> / <code>s.intersection(t)</code> / <code>s.difference(t)</code><span class="desc">non-mutating ops</span></td>
+            </tr>
+            <tr>
+              <td><code>min(s)</code> / <code>max(s)</code> / <code>sum(s)</code><span class="desc">aggregates (order not guaranteed!)</span></td>
+              <td><code>s.update(t)</code> / <code>s.intersection_update(t)</code><span class="desc">mutating ops (= <code>|=</code>)</span></td>
+            </tr>
+            <tr>
+              <td><code>frozenset(iter)</code><span class="desc">immutable variant</span></td>
+              <td><code>s.pop()</code><span class="desc">remove arbitrary element</span></td>
+            </tr>
+            <tr>
+              <td><code>x in s</code><span class="desc">O(1) membership (operator)</span></td>
+              <td><code>s.issubset(t)</code> / <code>s.issuperset(t)</code> / <code>s.isdisjoint(t)</code><span class="desc">relation checks</span></td>
+            </tr>
+            <tr>
+              <td><code>sorted(s)</code><span class="desc">→ new sorted <em>list</em></span></td>
+              <td><code>s.symmetric_difference(t)</code><span class="desc">XOR (elements in exactly one)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- ====== DICT ====== -->
+    <article class="type-card dict" id="dict">
+      <div class="card-head">
+        <div class="type-name">
+          <span class="py-name">dict</span>
+          <span class="label">— mutable key→value mapping</span>
+        </div>
+        <span class="mut-tag mut">Mutable · Ordered (3.7+) · Hashable Keys</span>
+        <p class="core"><strong>Core distinction:</strong> Maps <em>hashable</em> keys to arbitrary values, with O(1) lookup by key. Since Python 3.7, insertion order is preserved. Use for labelled data, caches, configs, JSON — the most-used collection in Python.</p>
+      </div>
+      <div class="card-body">
+        <h4>5 Real-World Examples</h4>
+<pre class="code"><code><span class="tok-c"># 1) Three creation styles</span>
+literal = {<span class="tok-s">"name"</span>: <span class="tok-s">"Ada"</span>, <span class="tok-s">"age"</span>: <span class="tok-n">36</span>}
+constructor = <span class="tok-b">dict</span>(name=<span class="tok-s">"Ada"</span>, age=<span class="tok-n">36</span>)
+from_pairs = <span class="tok-b">dict</span>([(<span class="tok-s">"name"</span>, <span class="tok-s">"Ada"</span>), (<span class="tok-s">"age"</span>, <span class="tok-n">36</span>)])
+<span class="tok-b">print</span>(literal == constructor == from_pairs)
+<span class="tok-out"># True</span>
+<span class="tok-c"># Insertion order IS preserved (Python 3.7+):</span>
+<span class="tok-b">print</span>(<span class="tok-b">list</span>(literal.keys()))
+<span class="tok-out"># ['name', 'age']</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 2) Access: [] vs .get() vs setdefault()</span>
+user = {<span class="tok-s">"name"</span>: <span class="tok-s">"Ada"</span>, <span class="tok-s">"email"</span>: <span class="tok-s">"ada@x.com"</span>}
+<span class="tok-b">print</span>(user[<span class="tok-s">"name"</span>])              <span class="tok-out"># 'Ada'</span>
+<span class="tok-c"># user["phone"]  --&gt; KeyError! Use .get instead:</span>
+<span class="tok-b">print</span>(user.get(<span class="tok-s">"phone"</span>))         <span class="tok-out"># None</span>
+<span class="tok-b">print</span>(user.get(<span class="tok-s">"phone"</span>, <span class="tok-s">"N/A"</span>))   <span class="tok-out"># 'N/A'  (default)</span>
+<span class="tok-c"># setdefault: get-or-insert in one step:</span>
+user.setdefault(<span class="tok-s">"phone"</span>, []).append(<span class="tok-s">"555-0100"</span>)
+<span class="tok-b">print</span>(user[<span class="tok-s">"phone"</span>])            <span class="tok-out"># ['555-0100']</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 3) Iteration: keys, values, items</span>
+prices = {<span class="tok-s">"apple"</span>: <span class="tok-n">1.20</span>, <span class="tok-s">"banana"</span>: <span class="tok-n">0.50</span>, <span class="tok-s">"cherry"</span>: <span class="tok-n">3.00</span>}
+<span class="tok-k">for</span> fruit <span class="tok-k">in</span> prices:              <span class="tok-c"># iterates keys by default</span>
+    <span class="tok-b">print</span>(fruit, end=<span class="tok-s">" "</span>)
+<span class="tok-out"># apple banana cherry</span>
+<span class="tok-k">for</span> fruit, price <span class="tok-k">in</span> prices.items():   <span class="tok-c"># unpacked pairs</span>
+    <span class="tok-b">print</span>(<span class="tok-s">f"{fruit}: ${price:.2f}"</span>)
+total = <span class="tok-b">sum</span>(prices.values())
+<span class="tok-b">print</span>(<span class="tok-s">f"Total: ${total:.2f}"</span>)
+<span class="tok-out"># Total: $4.70</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 4) Update, merge, and pop</span>
+defaults = {<span class="tok-s">"theme"</span>: <span class="tok-s">"light"</span>, <span class="tok-s">"lang"</span>: <span class="tok-s">"en"</span>, <span class="tok-s">"tz"</span>: <span class="tok-s">"UTC"</span>}
+user_prefs = {<span class="tok-s">"theme"</span>: <span class="tok-s">"dark"</span>, <span class="tok-s">"lang"</span>: <span class="tok-s">"fr"</span>}
+defaults.update(user_prefs)        <span class="tok-c"># in-place merge</span>
+<span class="tok-b">print</span>(defaults)
+<span class="tok-out"># {'theme': 'dark', 'lang': 'fr', 'tz': 'UTC'}</span>
+removed = defaults.pop(<span class="tok-s">"tz"</span>)        <span class="tok-out"># 'UTC'</span>
+last = defaults.popitem()          <span class="tok-c"># removes last inserted (LIFO)</span>
+<span class="tok-c"># Python 3.9+ merge operator | :</span>
+merged = {<span class="tok-s">"a"</span>: <span class="tok-n">1</span>} | {<span class="tok-s">"b"</span>: <span class="tok-n">2</span>}
+<span class="tok-b">print</span>(merged)                   <span class="tok-out"># {'a': 1, 'b': 2}</span></code></pre>
+
+<pre class="code"><code><span class="tok-c"># 5) Dict comprehension &amp; nested dicts</span>
+nums = [<span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>, <span class="tok-n">4</span>, <span class="tok-n">5</span>]
+squares = {n: n*n <span class="tok-k">for</span> n <span class="tok-k">in</span> nums}
+<span class="tok-b">print</span>(squares)
+<span class="tok-out"># {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}</span>
+<span class="tok-c"># Invert a dict (values must be unique):</span>
+inverted = {v: k <span class="tok-k">for</span> k, v <span class="tok-k">in</span> squares.items()}
+<span class="tok-b">print</span>(inverted[<span class="tok-n">25</span>])              <span class="tok-out"># 5</span>
+<span class="tok-c"># Nested: dict-of-dicts (think JSON)</span>
+company = {
+    <span class="tok-s">"engineering"</span>: {<span class="tok-s">"headcount"</span>: <span class="tok-n">12</span>, <span class="tok-s">"budget"</span>: <span class="tok-n">1_000_000</span>},
+    <span class="tok-s">"sales"</span>:       {<span class="tok-s">"headcount"</span>: <span class="tok-n">5</span>,  <span class="tok-s">"budget"</span>: <span class="tok-n">500_000</span>},
+}
+<span class="tok-b">print</span>(company[<span class="tok-s">"engineering"</span>][<span class="tok-s">"budget"</span>])
+<span class="tok-out"># 1000000</span></code></pre>
+
+        <h4>Functions vs Methods</h4>
+        <table class="fn-mt">
+          <thead>
+            <tr><th class="fn-col">Built-in Functions</th><th class="mt-col">dict Methods</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>len(d)</code><span class="desc">→ number of keys</span></td>
+              <td><code>d.keys()</code> / <code>d.values()</code> / <code>d.items()</code><span class="desc">live views</span></td>
+            </tr>
+            <tr>
+              <td><code>dict(pairs)</code><span class="desc">constructor</span></td>
+              <td><code>d.get(k, default)</code><span class="desc">safe lookup (no KeyError)</span></td>
+            </tr>
+            <tr>
+              <td><code>sorted(d)</code><span class="desc">→ sorted list of keys</span></td>
+              <td><code>d.update(other)</code><span class="desc">merge in place</span></td>
+            </tr>
+            <tr>
+              <td><code>"k" in d</code><span class="desc">O(1) key membership (operator)</span></td>
+              <td><code>d.pop(k)</code> / <code>d.popitem()</code><span class="desc">remove by key / LIFO</span></td>
+            </tr>
+            <tr>
+              <td><code>json.dumps(d)</code><span class="desc">serialise (from <code>json</code> module)</span></td>
+              <td><code>d.setdefault(k, default)</code><span class="desc">get-or-insert</span></td>
+            </tr>
+            <tr>
+              <td><code>d1 | d2</code><span class="desc">3.9+ merge → new dict (operator)</span></td>
+              <td><code>d.clear()</code> / <code>d.copy()</code> / <code>d.fromkeys(iter, v)</code><span class="desc">bulk / shallow copy / classmethod</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<footer>
+  Built as a self-contained study aid · All examples run on Python 3.10+ · Compare with <code>is</code> for None, <code>==</code> for values
+</footer>
+
+</main>
+
+<button class="totop" id="totop" aria-label="Back to top">↑</button>
+
+<script>
+// ====== Smooth scroll from tree nodes ======
+document.querySelectorAll('.node[data-target]').forEach(node => {
+  node.addEventListener('click', () => {
+    const sel = node.getAttribute('data-target');
+    const target = document.querySelector(sel);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// ====== Active nav link highlighting ======
+const navLinks = document.querySelectorAll('nav.main-nav a');
+const sections = ['big-picture', 'fvm', 'none', 'single', 'multiple']
+  .map(id => document.getElementById(id))
+  .filter(Boolean);
+
+function syncNav() {
+  const scrollY = window.scrollY + 140;
+  let active = sections[0];
+  sections.forEach(s => {
+    if (s.offsetTop <= scrollY) active = s;
+  });
+  navLinks.forEach(a => {
+    a.style.background = '';
+    a.style.color = '';
+    a.style.borderColor = '';
+    if (a.getAttribute('href') === '#' + active.id) {
+      a.style.background = 'rgba(20, 184, 166, 0.18)';
+      a.style.color = '#5eead4';
+      a.style.borderColor = 'rgba(20, 184, 166, 0.3)';
+    }
+  });
+}
+window.addEventListener('scroll', syncNav);
+syncNav();
+
+// ====== Back to top button ======
+const toTop = document.getElementById('totop');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 600) toTop.classList.add('show');
+  else toTop.classList.remove('show');
+});
+toTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+
+</body>
+</html>
